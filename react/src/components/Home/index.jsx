@@ -5,8 +5,16 @@ import React from 'react';
  */
 export const Home = () => {
   return (
-    <div>
+    <div data-easytag="testtag">
       <div>This is home page</div>
+      <div>
+        <ul>
+          <li>Li 1</li>
+          <li>Li 2</li>
+          <li>Li 3</li>
+          <li>Li 4</li>
+        </ul>
+      </div>
     </div>
   );
 };
