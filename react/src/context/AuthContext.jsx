@@ -1,4 +1,5 @@
 import React, { createContext, useCallback, useEffect, useMemo, useState } from 'react';
+import { logout as apiLogout } from '../api/auth';
 
 const AuthContext = createContext({
   authToken: null,
@@ -36,18 +37,21 @@ export const AuthProvider = ({ children }) => {
     initializeFromStorage();
   }, [initializeFromStorage]);
 
-  const login = useCallback((token, member) => {
-    setAuthToken(token);
+  const login = useCallback((tokenValue, memberValue) => {
+    setAuthToken(tokenValue);
     if (typeof window !== 'undefined') {
-      window.localStorage.setItem('authToken', token);
-      if (member) {
-        setCurrentMember(member);
-        window.localStorage.setItem('currentMember', JSON.stringify(member));
+      window.localStorage.setItem('authToken', tokenValue);
+      if (memberValue) {
+        setCurrentMember(memberValue);
+        window.localStorage.setItem('currentMember', JSON.stringify(memberValue));
       }
     }
   }, []);
 
-  const logout = useCallback(() => {
+  const logout = useCallback(async () => {
+    try {
+      await apiLogout();
+    } catch (error) {}
     setAuthToken(null);
     setCurrentMember(null);
     if (typeof window !== 'undefined') {
