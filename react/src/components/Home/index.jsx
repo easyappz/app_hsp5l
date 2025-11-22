@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { LoginForm } from '../Auth/LoginForm';
 import { RegisterForm } from '../Auth/RegisterForm';
 import { useAuth } from '../../context/AuthContext';
+import { ChatBox } from '../Chat/ChatBox';
 
 export const Home = () => {
   const { currentMember, logout } = useAuth();
@@ -17,8 +18,7 @@ export const Home = () => {
     <div data-easytag="id1-react/src/components/Home/index.jsx" className="home-page">
       <div className="home-layout">
         <section className="home-chat">
-          <h1 className="home-title">Групповой чат</h1>
-          <div className="home-chat-placeholder">Область чата</div>
+          <ChatBox />
         </section>
         <aside className="home-auth">
           <h2 className="home-auth-title">Авторизация и регистрация</h2>
