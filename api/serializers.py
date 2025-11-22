@@ -98,3 +98,44 @@ class MessageCreateSerializer(serializers.Serializer):
             text=validated_data["text"],
         )
         return message
+
+
+class ProfileSerializer(serializers.ModelSerializer):
+    new_password = serializers.CharField(write_only=True, required=False, max_length=128)
+    old_password = serializers.CharField(write_only=True, required=False, allow_blank=True, max_length=128)
+
+    class Meta:
+        model = Member
+        fields = ["id", "nickname", "created_at", "new_password", "old_password"]
+        read_only_fields = ["id", "created_at"]
+
+    def validate_nickname(self, value):
+        member = self.instance
+        queryset = Member.objects.all()
+        if member is not None:
+            queryset = queryset.exclude(pk=member.pk)
+        if queryset.filter(nickname=value).exists():
+            raise serializers.ValidationError("Nickname is already taken.")
+        return value
+
+    def validate(self, attrs):
+        new_password = attrs.get("new_password")
+        old_password = attrs.get("old_password")
+        member = self.instance
+        if new_password is not None and new_password != "":
+            if member is None:
+                raise serializers.ValidationError({"new_password": "Member instance is required."})
+            if old_password is not None and old_password != "":
+                if not check_password(old_password, member.password):
+                    raise serializers.ValidationError({"old_password": "Old password is incorrect."})
+        return attrs
+
+    def update(self, instance, validated_data):
+        new_password = validated_data.pop("new_password", None)
+        validated_data.pop("old_password", None)
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        if new_password is not None and new_password != "":
+            instance.password = make_password(new_password)
+        instance.save()
+        return instance

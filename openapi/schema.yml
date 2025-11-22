@@ -109,6 +109,91 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /api/profile/:
+    get:
+      operationId: profile_retrieve
+      description: Get current authenticated member profile
+      tags:
+      - profile
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Member'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      operationId: profile_update
+      description: Update current authenticated member profile
+      tags:
+      - profile
+      security:
+      - tokenAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProfileUpdateRequest'
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Member'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    patch:
+      operationId: profile_partial_update
+      description: Partially update current authenticated member profile
+      tags:
+      - profile
+      security:
+      - tokenAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProfileUpdateRequest'
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Member'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /api/chat/messages/:
     get:
       operationId: chat_messages_list
@@ -299,6 +384,15 @@ components:
           type: string
       required:
       - text
+    ProfileUpdateRequest:
+      type: object
+      properties:
+        nickname:
+          type: string
+        new_password:
+          type: string
+        old_password:
+          type: string
   securitySchemes:
     basicAuth:
       type: http

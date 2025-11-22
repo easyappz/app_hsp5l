@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import HelloView, RegisterView, LoginView, MeView, LogoutView, ChatMessageListCreateView
+from .views import HelloView, RegisterView, LoginView, MeView, LogoutView, ChatMessageListCreateView, ProfileView
 
 urlpatterns = [
     path("hello/", HelloView.as_view(), name="hello"),
@@ -8,4 +8,5 @@ urlpatterns = [
     path("auth/me/", MeView.as_view(), name="auth-me"),
     path("auth/logout/", LogoutView.as_view(), name="auth-logout"),
     path("chat/messages/", ChatMessageListCreateView.as_view(), name="chat-messages"),
+    path("profile/", ProfileView.as_view(), name="profile"),
 ]

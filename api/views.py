@@ -13,6 +13,7 @@ from .serializers import (
     AuthTokenResponseSerializer,
     MessageSerializer,
     MessageCreateSerializer,
+    ProfileSerializer,
 )
 from .authentication import TokenAuthentication
 
@@ -150,3 +151,41 @@ class ChatMessageListCreateView(APIView):
         message = serializer.save()
         read_serializer = MessageSerializer(message)
         return Response(read_serializer.data, status=status.HTTP_201_CREATED)
+
+
+class ProfileView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [permissions.IsAuthenticated]
+
+    @extend_schema(
+        responses={200: ProfileSerializer},
+        description="Get current authenticated member profile",
+    )
+    def get(self, request):
+        member = request.user
+        serializer = ProfileSerializer(member)
+        return Response(serializer.data)
+
+    @extend_schema(
+        request=ProfileSerializer,
+        responses={200: ProfileSerializer},
+        description="Update current authenticated member profile",
+    )
+    def put(self, request):
+        member = request.user
+        serializer = ProfileSerializer(member, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+
+    @extend_schema(
+        request=ProfileSerializer,
+        responses={200: ProfileSerializer},
+        description="Partially update current authenticated member profile",
+    )
+    def patch(self, request):
+        member = request.user
+        serializer = ProfileSerializer(member, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
