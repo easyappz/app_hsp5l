@@ -19,7 +19,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Message'
+                $ref: '#/components/schemas/HelloMessage'
           description: ''
   /api/auth/register/:
     post:
@@ -109,9 +109,77 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /api/chat/messages/:
+    get:
+      operationId: chat_messages_list
+      description: List messages from the global chat room
+      tags:
+      - chat
+      security:
+      - tokenAuth: []
+      parameters:
+      - in: query
+        name: limit
+        required: false
+        description: Maximum number of messages to return
+        schema:
+          type: integer
+      - in: query
+        name: after_id
+        required: false
+        description: Return messages with id greater than this value
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Message'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      operationId: chat_messages_create
+      description: Create a new message in the global chat room
+      tags:
+      - chat
+      security:
+      - tokenAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MessageCreate'
+      responses:
+        '201':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 components:
   schemas:
-    Message:
+    HelloMessage:
       type: object
       properties:
         message:
@@ -178,6 +246,59 @@ components:
           type: string
       required:
       - detail
+    ChatRoom:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 100
+      required:
+      - id
+      - name
+    ChatAuthor:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        nickname:
+          type: string
+          maxLength: 50
+      required:
+      - id
+      - nickname
+    Message:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        text:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        author:
+          $ref: '#/components/schemas/ChatAuthor'
+        room_id:
+          type: integer
+      required:
+      - id
+      - text
+      - created_at
+      - author
+      - room_id
+    MessageCreate:
+      type: object
+      properties:
+        text:
+          type: string
+      required:
+      - text
   securitySchemes:
     basicAuth:
       type: http

@@ -1,9 +1,9 @@
 from django.contrib.auth.hashers import make_password, check_password
 from rest_framework import serializers
-from .models import Member
+from .models import Member, ChatRoom, Message
 
 
-class MessageSerializer(serializers.Serializer):
+class HelloMessageSerializer(serializers.Serializer):
     message = serializers.CharField(max_length=200)
     timestamp = serializers.DateTimeField(read_only=True)
 
@@ -57,3 +57,44 @@ class MemberLoginSerializer(serializers.Serializer):
 class AuthTokenResponseSerializer(serializers.Serializer):
     token = serializers.CharField()
     member = MemberSerializer()
+
+
+class ChatRoomSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ChatRoom
+        fields = ["id", "name"]
+
+
+class MessageAuthorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Member
+        fields = ["id", "nickname"]
+
+
+class MessageSerializer(serializers.ModelSerializer):
+    author = MessageAuthorSerializer(read_only=True)
+    room_id = serializers.IntegerField(source="room.id", read_only=True)
+
+    class Meta:
+        model = Message
+        fields = ["id", "text", "created_at", "author", "room_id"]
+        read_only_fields = ["id", "created_at", "author", "room_id"]
+
+
+class MessageCreateSerializer(serializers.Serializer):
+    text = serializers.CharField()
+
+    def validate_text(self, value):
+        if not value or not value.strip():
+            raise serializers.ValidationError("Text cannot be empty.")
+        return value
+
+    def create(self, validated_data):
+        member = self.context["member"]
+        room = self.context["room"]
+        message = Message.objects.create(
+            room=room,
+            author=member,
+            text=validated_data["text"],
+        )
+        return message

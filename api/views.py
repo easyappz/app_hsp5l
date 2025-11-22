@@ -4,23 +4,26 @@ from drf_spectacular.utils import extend_schema
 from rest_framework import permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .models import AuthToken
+from .models import AuthToken, ChatRoom, Message
 from .serializers import (
-    MessageSerializer,
+    HelloMessageSerializer,
     MemberRegistrationSerializer,
     MemberSerializer,
     MemberLoginSerializer,
     AuthTokenResponseSerializer,
+    MessageSerializer,
+    MessageCreateSerializer,
 )
+from .authentication import TokenAuthentication
 
 
 class HelloView(APIView):
     @extend_schema(
-        responses={200: MessageSerializer}, description="Get a hello world message"
+        responses={200: HelloMessageSerializer}, description="Get a hello world message"
     )
     def get(self, request):
         data = {"message": "Hello!", "timestamp": timezone.now()}
-        serializer = MessageSerializer(data)
+        serializer = HelloMessageSerializer(data)
         return Response(serializer.data)
 
 
@@ -97,3 +100,53 @@ class LogoutView(APIView):
         if token is not None:
             token.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class ChatMessageListCreateView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [permissions.IsAuthenticated]
+
+    @extend_schema(
+        responses={200: MessageSerializer},
+        description="List messages from the global chat room",
+    )
+    def get(self, request):
+        room, created = ChatRoom.objects.get_or_create(name="Global chat")
+        queryset = Message.objects.filter(room=room)
+        after_id_param = request.query_params.get("after_id")
+        if after_id_param is not None:
+            try:
+                after_id = int(after_id_param)
+                queryset = queryset.filter(id__gt=after_id)
+            except ValueError:
+                pass
+        limit = 50
+        limit_param = request.query_params.get("limit")
+        if limit_param is not None:
+            try:
+                value = int(limit_param)
+                if value > 0:
+                    if value > 200:
+                        value = 200
+                    limit = value
+            except ValueError:
+                pass
+        queryset = queryset.order_by("created_at")[:limit]
+        serializer = MessageSerializer(queryset, many=True)
+        return Response(serializer.data)
+
+    @extend_schema(
+        responses={201: MessageSerializer},
+        description="Create a new message in the global chat room",
+    )
+    def post(self, request):
+        room, created = ChatRoom.objects.get_or_create(name="Global chat")
+        member = request.user
+        serializer = MessageCreateSerializer(
+            data=request.data,
+            context={"member": member, "room": room},
+        )
+        serializer.is_valid(raise_exception=True)
+        message = serializer.save()
+        read_serializer = MessageSerializer(message)
+        return Response(read_serializer.data, status=status.HTTP_201_CREATED)
