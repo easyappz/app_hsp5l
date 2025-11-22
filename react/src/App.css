@@ -5,6 +5,7 @@ body,
 }
 
 body {
+  margin: 0;
   background-color: #f5f5f7;
   color: #111827;
 }
@@ -151,29 +152,27 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 6px 12px;
-  border-radius: 9999px;
-  font-size: 13px;
-  text-decoration: none;
-  background-color: #111827;
-  color: #ffffff;
 }
 
 .home-auth-link:hover {
-  background-color: #000000;
+  text-decoration: none;
 }
 
-.home-auth-logout-button {
+.home-auth-logout-button,
+.profile-logout-button {
   padding: 6px 12px;
   border-radius: 9999px;
   border: 1px solid #d1d5db;
   background-color: #ffffff;
   color: #111827;
   font-size: 13px;
+  font-weight: 500;
   cursor: pointer;
+  transition: background-color 0.15s ease;
 }
 
-.home-auth-logout-button:hover {
+.home-auth-logout-button:hover,
+.profile-logout-button:hover {
   background-color: #f3f4f6;
 }
 
@@ -222,25 +221,34 @@ body {
   color: #4b5563;
 }
 
-.auth-form-input {
+.auth-form-input,
+.profile-input,
+.chat-input {
   padding: 8px 10px;
   border-radius: 8px;
   border: 1px solid #d1d5db;
   font-size: 14px;
   outline: none;
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  box-sizing: border-box;
 }
 
-.auth-form-input:focus {
+.auth-form-input:focus,
+.profile-input:focus,
+.chat-input:focus {
   border-color: #111827;
   box-shadow: 0 0 0 1px #11182711;
 }
 
-.auth-form-input:disabled {
+.auth-form-input:disabled,
+.profile-input:disabled,
+.chat-input:disabled {
   background-color: #f9fafb;
+  color: #6b7280;
 }
 
-.auth-form-error {
+.auth-form-error,
+.profile-error-text {
   font-size: 13px;
   color: #b91c1c;
   background-color: #fee2e2;
@@ -248,26 +256,51 @@ body {
   padding: 8px 10px;
 }
 
-.auth-form-button {
-  margin-top: 4px;
-  padding: 8px 12px;
+.profile-success-text {
+  font-size: 13px;
+  color: #065f46;
+  background-color: #d1fae5;
+  border-radius: 8px;
+  padding: 8px 10px;
+}
+
+.auth-form-button,
+.chat-send-button,
+.home-auth-link,
+.profile-button,
+.profile-link-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 14px;
   border-radius: 9999px;
   border: none;
   background-color: #111827;
   color: #ffffff;
   font-size: 14px;
   font-weight: 500;
+  text-decoration: none;
   cursor: pointer;
   transition: background-color 0.15s ease, transform 0.05s ease;
 }
 
-.auth-form-button:hover {
+.auth-form-button:hover,
+.chat-send-button:hover,
+.home-auth-link:hover,
+.profile-button:hover,
+.profile-link-button:hover {
   background-color: #000000;
 }
 
-.auth-form-button:disabled {
+.auth-form-button:disabled,
+.chat-send-button:disabled,
+.profile-button:disabled {
   background-color: #6b7280;
   cursor: default;
+}
+
+.auth-form-button {
+  margin-top: 4px;
 }
 
 .profile-page {
@@ -287,6 +320,78 @@ body {
 .profile-page-content {
   font-size: 14px;
   color: #4b5563;
+}
+
+.profile-page-message {
+  font-size: 14px;
+  color: #4b5563;
+}
+
+.profile-page-error {
+  font-size: 14px;
+  color: #b91c1c;
+}
+
+.profile-page-links {
+  margin-top: 16px;
+  display: flex;
+  gap: 10px;
+}
+
+.profile-link-button {
+  font-size: 13px;
+}
+
+.profile-section {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.profile-section-title {
+  margin: 0 0 10px 0;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.profile-field {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  font-size: 14px;
+  color: #4b5563;
+}
+
+.profile-field-label {
+  font-weight: 500;
+}
+
+.profile-field-value {
+  font-weight: 600;
+  color: #111827;
+}
+
+.profile-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.profile-label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 13px;
+  color: #4b5563;
+}
+
+.profile-button {
+  align-self: flex-start;
+}
+
+.profile-logout-button {
+  margin-top: 4px;
 }
 
 .chat-box {
@@ -402,30 +507,4 @@ body {
 
 .chat-input {
   flex: 1;
-  border-radius: 9999px;
-  border: 1px solid #d1d5db;
-  padding: 8px 12px;
-  font-size: 14px;
-  outline: none;
-}
-
-.chat-input:disabled {
-  background-color: #e5e7eb;
-  color: #6b7280;
-}
-
-.chat-send-button {
-  border-radius: 9999px;
-  border: none;
-  padding: 8px 14px;
-  font-size: 14px;
-  font-weight: 500;
-  background-color: #111827;
-  color: #ffffff;
-  cursor: pointer;
-}
-
-.chat-send-button:disabled {
-  background-color: #6b7280;
-  cursor: default;
 }
